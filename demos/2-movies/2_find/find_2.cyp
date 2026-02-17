@@ -1,0 +1,3 @@
+// Find the movie with title "Cloud Atlas"...
+MATCH (cloudAtlas {title: "Cloud Atlas"})
+RETURN cloudAtlas

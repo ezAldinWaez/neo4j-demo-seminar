@@ -1,0 +1,3 @@
+// Find the actor named "Tom Hanks"...
+MATCH (tom {name: "Tom Hanks"})
+RETURN tom

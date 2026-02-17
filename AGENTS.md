@@ -5,32 +5,49 @@ This file provides guidance to agents when working with code in this repository.
 # Project Guidelines
 
 ## Code Style
-- Cypher scripts use `//` comments, uppercase keywords, and a single comma-delimited `CREATE` block for node/relationship creation. See demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp.
-- Dates are stored as `date('YYYY-MM-DD')`, and enums are uppercase strings (e.g., `HUSBAND`, `WIFE`, `ACTIVE`). See demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp.
+- **General**: Cypher scripts use `//` comments and uppercase keywords (e.g., `MATCH`, `CREATE`).
+- **Family Tree**: Uses single comma-delimited `CREATE` blocks. Dates are `date('YYYY-MM-DD')`. Enums are uppercase strings (`HUSBAND`, `WIFE`). See `demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp`.
+- **Movies**: Follows standard Neo4j conventions. PascalCase labels (`Person`, `Movie`), UPPER_SNAKE_CASE relationships (`ACTED_IN`), and camelCase properties (`tagline`). See `demos/2-movies/1_create/create_movies.cyp`.
+- **Python**: Standard `snake_case`. Uses type hinting and `textwrap.dedent` for Cypher queries.
 
 ## Architecture
-- This is a Neo4j seminar demo centered on a family tree dataset. The main dataset is defined in demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp.
-- `Person` nodes have `id`, `first_name`, `last_name`, `sex`, `birth_date`, optional `death_date`, `education`, `works`.
-- `Family` nodes have `id`, `marriage_date`, `status`, optional `divorce_date`.
-- Relationships: `SPOUSE_OF` (with `role` = `HUSBAND` or `WIFE`) and `CHILD_OF` from person to family.
+- **Family Tree (`demos/1-family-tree`)**:
+  - `Person` nodes: `id`, `first_name`, `last_name`, `sex`, `birth_date`, `death_date`.
+  - `Family` nodes: `id`, `marriage_date`, `status`, `divorce_date`.
+  - Relationships: `SPOUSE_OF` (roles `HUSBAND`/`WIFE`), `CHILD_OF`.
+- **Movies (`demos/2-movies`)**:
+  - `Person` nodes (`name`, `born`) connected to `Movie` nodes (`title`, `released`, `tagline`) via `ACTED_IN`, `DIRECTED`, etc.
+- **Python App (`demos/3-movies-python-bolt`)**:
+  - Web app with Sync (Flask) and Async (FastAPI) modes.
+  - Frontend: `static/index.html` (jQuery, d3.js).
+  - Backend: Connects to Neo4j via official Python driver.
 
 ## Build and Test
-- No build system in this repo; run Cypher scripts directly in Neo4j.
-- Start Neo4j locally (Docker): `docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password neo4j:latest`.
-- Load data: open demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp in Neo4j Browser and execute the script.
-- Validate data with the single-purpose checks in demos/1-family-tree/2_validation_queries (spouse count/roles, gender consistency, birth before marriage, death after birth).
+- **Family Tree**:
+  - Start Neo4j: `docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password neo4j:latest`.
+  - Load: Run `demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp`.
+  - Validate: Run scripts in `demos/1-family-tree/2_validation_queries`.
+- **Movies Python App**:
+  - Requires Python 3.10+.
+  - Install dependencies: `pip install -r demos/3-movies-python-bolt/requirements-sync.txt` (or separate async reqs).
+  - Run Sync: `python demos/3-movies-python-bolt/movies_sync.py` (http://127.0.0.1:8080).
+  - Run Async: `python demos/3-movies-python-bolt/movies_async.py` (http://127.0.0.1:8080).
+  - Config: Set `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` environment variables if not using default.
 
 ## Project Conventions
-- Constraints are created with `IF NOT EXISTS` for idempotent runs. See demos/1-family-tree/1_init/load_cruz_young_family_tree.cyp.
-- Validation queries are separate, scoped scripts under demos/1-family-tree/2_validation_queries.
-- Reports live in demos/1-family-tree/3_basic_reports; advanced reports are staged under demos/1-family-tree/4_advanced_reports.
+- **Family Tree**: Constraints created with `IF NOT EXISTS`. Validation queries are strictly scoped. Reports in `3_basic_reports` and `4_advanced_reports`.
+- **Movies**: Numbered folders (`1_create` -> `6_clean_up`) indicate execution order.
+- **Python**: Scripts suffixed with `_sync` or `_async`.
 
 ## Integration Points
-- Neo4j database (5.x or 6.x). Optional Python driver usage is documented in the dev environment note below.
+- **Database**: Neo4j 5.x or 6.x.
+- **Drivers**: Python `neo4j` driver used in `demos/3-movies-python-bolt`.
+- **Visualization**: `neomodel` and `py2neo` libraries available in the environment.
 
 ## Security
-- Demo credentials in the Docker example (`neo4j/password`) are for local use only.
+- **Credentials**: Default Docker credentials (`neo4j/password`) are for local development only. Do not commit real credentials.
 
 ## Development Environment
-- Python 3.14 venv with Neo4j libraries: `neo4j` (6.0.3), `neomodel` (6.0.1), `py2neo` (2021.2.4).
-- Activate the venv with: `source .venv/bin/activate`.
+- Python virtual environment is recommended (`.venv`).
+- Activate with: `source .venv/bin/activate`.
+- Key libraries: `neo4j`, `neomodel`, `py2neo`.

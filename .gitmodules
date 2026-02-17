@@ -1,0 +1,4 @@
+[submodule "demos/3-movies-python-bolt"]
+	path = demos/3-movies-python-bolt
+	url = https://github.com/neo4j-examples/movies-python-bolt
+	branch = main

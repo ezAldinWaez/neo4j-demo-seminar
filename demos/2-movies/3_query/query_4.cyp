@@ -1,0 +1,3 @@
+// How people are related to "Cloud Atlas"...
+MATCH (people:Person)-[relatedTo]-(:Movie {title: "Cloud Atlas"})
+RETURN people.name, Type(relatedTo), relatedTo
